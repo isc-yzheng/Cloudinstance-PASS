@@ -9,6 +9,8 @@ Property Company As %String;
 
 Property Phone As %VarString;
 
+// test changes
+
 Property DOB As %Date(MAXVAL = "$piece($horolog, "","", 1)");
 
 /// Index for property DOB
