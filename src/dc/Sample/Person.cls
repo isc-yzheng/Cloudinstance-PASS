@@ -9,7 +9,7 @@ Property Company As %String;
 
 Property Phone As %VarString;
 
-// test ok
+// test ok ok
 
 Property DOB As %Date(MAXVAL = "$piece($horolog, "","", 1)");
 
