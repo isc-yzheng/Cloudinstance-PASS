@@ -10,6 +10,7 @@ XData UrlMap
 
 ClassMethod SendEmail() As %Status
 {
+	//test
 	//Read JSON string into variable.
 	Set Data = %request.Content.Read()
 
