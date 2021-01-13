@@ -28,7 +28,7 @@ limitations under the License.
 
 # Identifiers of Service account
 SERVICE_ACCOUNT_EMAIL_ADDRESS = 'googlepass@zssh-216905.iam.gserviceaccount.com' # CHANGEME
-SERVICE_ACCOUNT_FILE = 'C:\\Users\\hacha\\Downloads\\passes-rest-samples-master\\passes-rest-samples-master\\python\\googlePass-zssh-216905-21bc637051f5.json' # CHANGEME. Path to file with private key and Google credential config
+SERVICE_ACCOUNT_FILE = 'googlePass-zssh-216905-21bc637051f5.json' # CHANGEME. Path to file with private key and Google credential config
 
 # Identifier of Google Pay API for Passes Merchant Center
 ISSUER_ID = '3388000000008412374'# CHANGEME
