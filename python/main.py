@@ -19,6 +19,7 @@ import services # methods that returns JWTs to be used to rend "save to phone" b
 import uuid # std library for unique identifier generation
 import irisnative
 
+
 SAVE_LINK = "https://pay.google.com/gp/v/save/" # Save link that uses JWT. See https://developers.google.com/pay/passes/guides/get-started/implementing-the-api/save-to-google-pay#add-link-to-email
 
 
@@ -27,13 +28,10 @@ def demoObjectJwt(verticalType ,classId, objectId):
   print('''
 
   #############################
-  #
   #  Generates a signed "object" JWT.
   #  1 REST call is made to pre-insert class.
-  #
   #  This JWT can be used in JS web button.
   #  If this JWT only contains 1 object, usually isn't too long; can be used in Android intents/redirects.
-  #
   #############################
 
   ''')
@@ -52,14 +50,11 @@ def demoFatJwt(verticalType, classId, objectId):
   print('''
 
   #############################
-  #
   #  Generates a signed "fat" JWT.
   #  No REST calls made.
-  #
   #  Use fat JWT in JS web button.
   #  Fat JWT is too long to be used in Android intents.
   #  Possibly might break in redirects.
-  #
   #############################
 
   ''')
@@ -76,6 +71,7 @@ def demoFatJwt(verticalType, classId, objectId):
 
 def demoSkinnyJwt(verticalType, classId, objectId):
   # Modify connection info based on your environment
+ 
   ip = "127.0.0.1"
   port = 51773
   namespace = "INTERN"
@@ -89,20 +85,26 @@ def demoSkinnyJwt(verticalType, classId, objectId):
   print('''
 
   #############################
-  #
   #  Generates a signed "skinny" JWT.
   #  2 REST calls are made:
   #    x1 pre-insert one classes
   #    x1 pre-insert one object which uses previously inserted class
-  #
   #  This JWT can be used in JS web button.
   #  This is the shortest type of JWT; recommended for Android intents/redirects.
-  #
   #############################
 
   ''')
 
-  skinnyJwt = services.makeSkinnyJwt(verticalType, classId, objectId)
+  
+  Globalname = dbnative.get("name")
+  Globalemail = dbnative.get("email")
+  Globaldate = dbnative.get("date")
+  Globaldoctor = dbnative.get("doctor")
+  Globalhospital = dbnative.get("hospital")
+  Globallocation = dbnative.get("location")
+  Globalservice = dbnative.get("service")
+
+  skinnyJwt = services.makeSkinnyJwt(verticalType, classId, objectId, Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice)
 
   if skinnyJwt is not None:
     print('This is an "skinny" jwt:\n%s\n' % (skinnyJwt.decode('UTF-8')) )
@@ -111,27 +113,22 @@ def demoSkinnyJwt(verticalType, classId, objectId):
     print("[1. Setting and getting a global]")
 
     dbnative.set(SAVE_LINK+skinnyJwt.decode('UTF-8'), "PassLink")
+    Globallink = dbnative.get("PassLink")
 
-    globalValue = dbnative.get("PassLink")
-
-    print("The value of testglobal is ", globalValue)
+    print("The value of testglobal is ", Globallink)
 
   return
 
 
 
 #############################
-#
 # RUNNER
-#
 # This script demonstrates using your services which make JWTs
-#
 # The JWTs are used to generate save links or JS Web buttons to save Pass(es)
 #
 # 1) Get credentials and check prerequisistes in: https://developers.google.com/pay/passes/samples/quickstart-python.
 # 2) Modify config.py so the credentials are correct.
 # 3) Try running it: python main.py . Check terminal output for server response, JWT, and save links.
-#
 #############################
 
 verticalType = services.VerticalType.OFFER

@@ -242,7 +242,7 @@ def makeObjectJwt(verticalType, classId, objectId):
 #
 #############################
 
-def makeSkinnyJwt(verticalType, classId, objectId):
+def makeSkinnyJwt(verticalType, classId, objectId,  Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice):
 
   signedJwt = None
   classResourcePayload = None
@@ -252,7 +252,7 @@ def makeSkinnyJwt(verticalType, classId, objectId):
 
   try:
     # get class definition and object definition
-    classResourcePayload, objectResourcePayload = getClassAndObjectDefinitions(verticalType, classId, objectId, classResourcePayload, objectResourcePayload)
+    classResourcePayload, objectResourcePayload = getClassAndObjectDefinitions(verticalType, classId, objectId, classResourcePayload, objectResourcePayload, Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice)
 
     print('\nMaking REST call to insert class: (%s)' % (classId))
     # make authorized REST call to explicitly insert class into Google server.
@@ -297,7 +297,7 @@ def makeSkinnyJwt(verticalType, classId, objectId):
 #  @param String objectResourcePayload - payload for the object
 #
 #############################
-def getClassAndObjectDefinitions(verticalType, classId, objectId, classResourcePayload, objectResourcePayload):
+def getClassAndObjectDefinitions(verticalType, classId, objectId, classResourcePayload, objectResourcePayload,  Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice):
   # get class definition and object definition
   if verticalType == VerticalType.FLIGHT:
     classResourcePayload = resourceDefinitions.makeFlightClassResource(classId)
@@ -312,7 +312,7 @@ def getClassAndObjectDefinitions(verticalType, classId, objectId, classResourceP
     classResourcePayload = resourceDefinitions.makeLoyaltyClassResource(classId)
     objectResourcePayload = resourceDefinitions.makeLoyaltyObjectResource(classId, objectId)
   elif verticalType == VerticalType.OFFER:
-    classResourcePayload = resourceDefinitions.makeOfferClassResource(classId)
+    classResourcePayload = resourceDefinitions.makeOfferClassResource(classId, Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice)
     objectResourcePayload = resourceDefinitions.makeOfferObjectResource(classId, objectId)          
   elif verticalType == VerticalType.TRANSIT:
     classResourcePayload = resourceDefinitions.makeTransitClassResource(classId)

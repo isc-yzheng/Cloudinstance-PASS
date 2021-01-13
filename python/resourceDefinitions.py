@@ -24,7 +24,8 @@ import datetime
 # @return Dict payload - represents Offer class resource
 #
 ###############################
-def makeOfferClassResource(classId):
+
+def makeOfferClassResource(classId, Globalname, Globaldate, Globaldoctor, Globalhospital, Globallocation, Globalservice):
   # Define the resource representation of the Class
   # values should be from your DB/services; here we hardcode information
 
@@ -41,7 +42,7 @@ def makeOfferClassResource(classId):
     ,"provider" : "Intersystems"
     ,"redemptionChannel" : "online"
     ,"reviewStatus" : "underReview"
-    ,"title" : "Appointment at RDH"
+    ,"title" : "Appointment at"+Globalhospital
     # optional
     ,"titleImage" : {
       "sourceUri" : {
@@ -68,12 +69,12 @@ def makeOfferClassResource(classId):
     }]
     ,"textModulesData": [
       {
-        "header": "Time"
-        ,"body": "Your appointment is scheduled on Tuesday 05-01-2021 at 5:00pm AEST at Royal Darwin Hospital."
+        "header": "Appointment Schedule"
+        ,"body": "Dear "+Globalname+",<br>Our Records show that you have an appointment on "+Globaldate+" with "+Globaldoctor+" at "+Globalhospital+", "+Globallocation+" in regards to "+Globalservice+"<br>Please ensure that you bring all the required documents to your appointment."
       },
       {
-        "header": "Appointment details",
-        "body": "Dr. Felicity, a female GP is going to examine your chest-Xray and Ultrasound"
+        "header": "",
+        "body": ""
       }
     ]
     ,"linksModuleData": {
@@ -85,7 +86,7 @@ def makeOfferClassResource(classId):
         }
         ,{
           "kind": "walletobjects#uri"
-          ,"uri": "tel:6505555555"
+          ,"uri": "tel:6505555555*Hosp phone*"
           ,"description": "Call Customer Service"
         }
       ]
