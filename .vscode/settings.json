@@ -1,7 +1,0 @@
-{
-    "objectscript.conn": {
-        "server": "azcloud",
-        "ns": "PASS",
-        "active": true
-    }
-}
