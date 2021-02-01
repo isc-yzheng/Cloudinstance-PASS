@@ -1,0 +1,8 @@
+bash: ls -l: command not found
+bash: /irisdev/app/python/python3.9 -V: No such file or directory
+bash: python3.9 -V: command not found
+bash: python3 -V: command not found
+bash: python -V: command not found
+bash: /usr/bin:/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:: No such file or directory
+bash: Python3.9: command not found
+bash: /opt/irisbuild/python3.9 -V: No such file or directory

@@ -1,0 +1,7 @@
+{
+    "objectscript.conn": {
+        "server": "azurecloud",
+        "ns": "PASS",
+        "active": true
+    }
+}

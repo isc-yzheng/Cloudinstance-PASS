@@ -1,0 +1,92 @@
+IRIS.DAT
+error.txt
+iris.lck
+stream
+/irisdev/app/dur/mgr/PASS
+/irisdev/app/dur/mgr/PASS
+/irisdev/app/dur/mgr/PASS
+/irisdev/app/dur/mgr/PASS
+
+
+  #############################
+  #  Generates a signed "skinny" JWT.
+  #  2 REST calls are made:
+  #    x1 pre-insert one classes
+  #    x1 pre-insert one object which uses previously inserted class
+  #  This JWT can be used in JS web button.
+  #  This is the shortest type of JWT; recommended for Android intents/redirects.
+  #############################
+
+  
+
+Making REST call to insert class: (3388000000008412374.OFFER_CLASS_fb459bcb-305d-4a18-9924-a7975514a9cc)
+
+Making REST call to insert object
+classId (3388000000008412374.OFFER_CLASS_fb459bcb-305d-4a18-9924-a7975514a9cc) insertion success!
+
+objectId (3388000000008412374.OFFER_OBJECT_c378702b-e31a-42cb-bed0-5d3039ab295b) insertion success!
+
+This is an "skinny" jwt:
+eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjEwMzksICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF9jMzc4NzAyYi1lMzFhLTQyY2ItYmVkMC01ZDMwMzlhYjI5NWIifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.CUUX0HN_yPhr2_htjBMPSHZYjJC6kKCwIqTG_FvANscNj__jkPev7KrPSf0ftZ8yveP61oXhVwcSPtbXlr1WHzyzhqJqMQFtrC5KxDw7gOmEezBrNCCo-gr9sLfGjZ-51EetzhQRNjGkioAxZJYx-zrYAWLKYB80stjl8ROTx3k2RSUwbmiYm7u0-ZLGDgFL9scS96V7q6US2a-6qbiHo7QAuGjZISj5u-U0i6iGQR3_Guf5SgbLL2wW_wMOc5QlrsPu9Gilv_0ZzFHi_-ftEI7OnV8QUSbC2xHX3tmCOZXwgLB5NLJgKVavWPtvN1e0sNEvVwk4-CX5WYCwqMtW6A==
+
+you can decode it with a tool to see the unsigned JWT representation:
+https://jwt.io
+
+[1. Setting and getting a global]
+The value of testglobal is  https://pay.google.com/gp/v/save/eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjEwMzksICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF9jMzc4NzAyYi1lMzFhLTQyY2ItYmVkMC01ZDMwMzlhYjI5NWIifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.CUUX0HN_yPhr2_htjBMPSHZYjJC6kKCwIqTG_FvANscNj__jkPev7KrPSf0ftZ8yveP61oXhVwcSPtbXlr1WHzyzhqJqMQFtrC5KxDw7gOmEezBrNCCo-gr9sLfGjZ-51EetzhQRNjGkioAxZJYx-zrYAWLKYB80stjl8ROTx3k2RSUwbmiYm7u0-ZLGDgFL9scS96V7q6US2a-6qbiHo7QAuGjZISj5u-U0i6iGQR3_Guf5SgbLL2wW_wMOc5QlrsPu9Gilv_0ZzFHi_-ftEI7OnV8QUSbC2xHX3tmCOZXwgLB5NLJgKVavWPtvN1e0sNEvVwk4-CX5WYCwqMtW6A==
+
+
+  #############################
+  #  Generates a signed "skinny" JWT.
+  #  2 REST calls are made:
+  #    x1 pre-insert one classes
+  #    x1 pre-insert one object which uses previously inserted class
+  #  This JWT can be used in JS web button.
+  #  This is the shortest type of JWT; recommended for Android intents/redirects.
+  #############################
+
+  
+
+Making REST call to insert class: (3388000000008412374.OFFER_CLASS_94c379d9-d89d-4b3c-9b61-c1e55db465b0)
+
+Making REST call to insert object
+classId (3388000000008412374.OFFER_CLASS_94c379d9-d89d-4b3c-9b61-c1e55db465b0) insertion success!
+
+objectId (3388000000008412374.OFFER_OBJECT_ffb6f3c1-d5c6-4ce0-836b-113e1c97b10e) insertion success!
+
+This is an "skinny" jwt:
+eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjExMzUsICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF9mZmI2ZjNjMS1kNWM2LTRjZTAtODM2Yi0xMTNlMWM5N2IxMGUifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.C2VB-P52Dg7XymU8tl9W4-QuKlVwT_NvZW8avpytmwg6CU34fQNoGtHF6Dwb7l-c26JKFuzhveiEUyoSUUU5uSrjb3ELYiWoVQCsPf197EXEyWA-3sFV81IS_xHyPtj36rWEz6CeH51roBrzIfCNa3zY_6dsN_uJKVKjhIlIbAEHnfo6EqZnQM9o-pFcSYyhowwlPXtxgkwluWDjJt9-kn9FLYtiyxxTGzPxeV_eHc69GlLbjIyf3ns2RhciDLes2i51sYigSSB-RWBasPuRK3Tu2zFhGWbM2_20i4mY_yxlPLhwG0xaweTBSVN7FuPAQ-NoDUIOS3XyPyqgLJXylw==
+
+you can decode it with a tool to see the unsigned JWT representation:
+https://jwt.io
+
+[1. Setting and getting a global]
+The value of testglobal is  https://pay.google.com/gp/v/save/eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjExMzUsICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF9mZmI2ZjNjMS1kNWM2LTRjZTAtODM2Yi0xMTNlMWM5N2IxMGUifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.C2VB-P52Dg7XymU8tl9W4-QuKlVwT_NvZW8avpytmwg6CU34fQNoGtHF6Dwb7l-c26JKFuzhveiEUyoSUUU5uSrjb3ELYiWoVQCsPf197EXEyWA-3sFV81IS_xHyPtj36rWEz6CeH51roBrzIfCNa3zY_6dsN_uJKVKjhIlIbAEHnfo6EqZnQM9o-pFcSYyhowwlPXtxgkwluWDjJt9-kn9FLYtiyxxTGzPxeV_eHc69GlLbjIyf3ns2RhciDLes2i51sYigSSB-RWBasPuRK3Tu2zFhGWbM2_20i4mY_yxlPLhwG0xaweTBSVN7FuPAQ-NoDUIOS3XyPyqgLJXylw==
+
+
+  #############################
+  #  Generates a signed "skinny" JWT.
+  #  2 REST calls are made:
+  #    x1 pre-insert one classes
+  #    x1 pre-insert one object which uses previously inserted class
+  #  This JWT can be used in JS web button.
+  #  This is the shortest type of JWT; recommended for Android intents/redirects.
+  #############################
+
+  
+
+Making REST call to insert class: (3388000000008412374.OFFER_CLASS_208c35a2-d09c-42b5-99f1-21f2289428eb)
+
+Making REST call to insert object
+classId (3388000000008412374.OFFER_CLASS_208c35a2-d09c-42b5-99f1-21f2289428eb) insertion success!
+
+objectId (3388000000008412374.OFFER_OBJECT_9a204eef-33a8-49bc-864e-ac4ae62814e4) insertion success!
+
+This is an "skinny" jwt:
+eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjE4MjEsICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF85YTIwNGVlZi0zM2E4LTQ5YmMtODY0ZS1hYzRhZTYyODE0ZTQifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.X9Bvz1_e6cQ9y5kO4QXBzybDh42joNhlWa74y5zi-CPUPPt6OB50ZTTDGndpgNyNxchh-9H__F_RKaSFNEVoikERZYdWnJVYUAE7dvGqqK1Eh3R6ZuAqSFIKOsZWtpuapYIyrPSunTwhiBL2M9Upa8obF34CxeTg4vNfW-_MBeT9sSswFz5KaCW4sccjrPzwRCUfBbzkAnT4GxyvJ6vJ-WyBvmDyQU8lDALwzb8mPLXfGUFJedUe_ZINQlTPdaYUbrOAKu8JpxVpPHwqxoRWTCghrfugQMKPY7YRDUuIs6eYnfhWEryshdwTF2SBXfTV5AGvlFwmNqBkklm5_wROQQ==
+
+you can decode it with a tool to see the unsigned JWT representation:
+https://jwt.io
+
+[1. Setting and getting a global]
+The value of testglobal is  https://pay.google.com/gp/v/save/eyJ0eXAiOiAiSldUIiwgImFsZyI6ICJSUzI1NiIsICJraWQiOiAiMjFiYzYzNzA1MWY1ZDcwZjUyZGU4ODJmNjI0MDI0NGEwOTJhYWFlMCJ9.eyJpc3MiOiAiZ29vZ2xlcGFzc0B6c3NoLTIxNjkwNS5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsICJhdWQiOiAiZ29vZ2xlIiwgInR5cCI6ICJzYXZldG9hbmRyb2lkcGF5IiwgImlhdCI6IDE2MTA2MjE4MjEsICJwYXlsb2FkIjogeyJvZmZlck9iamVjdHMiOiBbeyJpZCI6ICIzMzg4MDAwMDAwMDA4NDEyMzc0Lk9GRkVSX09CSkVDVF85YTIwNGVlZi0zM2E4LTQ5YmMtODY0ZS1hYzRhZTYyODE0ZTQifV19LCAib3JpZ2lucyI6IFsiaHR0cDovL2xvY2FsaG9zdDo4MDgwIl19.X9Bvz1_e6cQ9y5kO4QXBzybDh42joNhlWa74y5zi-CPUPPt6OB50ZTTDGndpgNyNxchh-9H__F_RKaSFNEVoikERZYdWnJVYUAE7dvGqqK1Eh3R6ZuAqSFIKOsZWtpuapYIyrPSunTwhiBL2M9Upa8obF34CxeTg4vNfW-_MBeT9sSswFz5KaCW4sccjrPzwRCUfBbzkAnT4GxyvJ6vJ-WyBvmDyQU8lDALwzb8mPLXfGUFJedUe_ZINQlTPdaYUbrOAKu8JpxVpPHwqxoRWTCghrfugQMKPY7YRDUuIs6eYnfhWEryshdwTF2SBXfTV5AGvlFwmNqBkklm5_wROQQ==
