@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-02-04 22:06:52">
+<Class name="Simple.CustomObject">
+<Super>%Persistent</Super>
+<TimeChanged>65749,80182.862634</TimeChanged>
+<TimeCreated>65749,80175.004842</TimeCreated>
+
+<Property name="Data">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="30000"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DataLocation>^Simple.CustomObjectD</DataLocation>
+<DefaultData>CustomObjectDefaultData</DefaultData>
+<IdLocation>^Simple.CustomObjectD</IdLocation>
+<IndexLocation>^Simple.CustomObjectI</IndexLocation>
+<StreamLocation>^Simple.CustomObjectS</StreamLocation>
+<Data name="CustomObjectDefaultData">
+<Structure>listnode</Structure>
+<Subscript/>
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Data</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="Simple.EmailOperation">
+<Super>Ens.BusinessOperation</Super>
+<TimeChanged>65751,77286.921171</TimeChanged>
+<TimeCreated>65749,75906.194609</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.EMail.OutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>EnsLib.EMail.OutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="m1">
+<FormalSpec>servData:Simple.CustomObject,*resp:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set dyobj = ##class(%DynamicObject).%FromJSON(servData.Data)
+	Set Message = "Hello "_dyobj.Name_" your appointment is confirmed on "_dyobj.Date
+	//Please Click the following link to add pass to your google wallet."_dyobj.wallet
+	Set Email=##class(%Net.MailMessage).%New()
+    Do Email.TextData.Write(Message)
+    Set Email.Subject= "Appointment Confirmation"
+    // Add reciepient from the JSON Object
+    Set tSc = ..Adapter.AddRecipients(Email,dyobj.Email)
+    //simple case--do not check for failed recipients
+    Set tSc=..Adapter.SendMail(Email)
+	//Check if email is sent successfully
+    If $$$ISOK(tSc) { 
+     Set resp = "Success.. Email sent!"
+    }
+    else {
+	Set resp = "Email send failed."
+   }
+	Quit tSc
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+	<MapItem MessageType= "Simple.CustomObject">
+		<Method>m1</Method>
+	</MapItem>
+</MapItems>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Simple.NewRestEmailOperation">
+<Super>Ens.BusinessOperation</Super>
+<TimeChanged>65777,78224.000468</TimeChanged>
+<TimeCreated>65751,77139.839975</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.EMail.OutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>EnsLib.EMail.OutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="SendSimpleEmail">
+<FormalSpec>pRequest:Ens.StringContainer,*pResponse:Ens.StringContainer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set pResponse = ##class(Ens.StringContainer).%New()
+	// Shows data in the Management portal under message viewer -> trace tab -> Full trace
+	$$$TRACE(pRequest)
+
+	$$$TRACE(pRequest.StringValue)
+
+	//Convert JSON String to Dynamic object.
+	Set Object = ##class(%DynamicObject).%FromJSON(pRequest.StringValue)
+
+	$$$TRACE(Object)
+
+	$$$TRACE(Object.Name)
+
+	$$$TRACE(Object.Email)
+	
+	//Create and set wallet pass link here
+
+	//Set global to blank everytime
+	Set ^PassLink = " "
+	Set ^name = Object.Name
+	Set ^email = Object.Email
+	Set ^mrn = Object.RegistrationNo
+	Set ^date = Object.Date
+	Set ^doctor = Object.Doctor
+	Set ^hospital = Object.Hospital
+	Set ^hospitalphone = Object.HospitalPhone
+	Set ^hospitaladdress = Object.HospitalAddress
+	Set ^location = Object.Location
+	Set ^service = Object.Service
+	
+	Set args($i(args)) = "C:/Users/hacha/Downloads/python_passes/main.py"
+	//Call python script to create wallet link
+	Set ret = ##class(Simple.ZFwrapper).RunCmd("Python",.args,.output)
+	
+	//SET ret = $ZF(-100,"/SHELL /LOGCMD /STDERR=error.txt ", "cmd /C C:/Python39/python.exe C:/Users/hacha/Downloads/passes-rest/passes-rest-samples-master/python/main.py")
+	
+	If ( $$$ISERR(ret) || $GET(^PassLink) = " " )
+	{
+	$$$TRACE("Global Value:"_$GET(^PassLink))
+	$$$TRACE("Error Message: "_output)
+	Quit $$$ERROR($$$GeneralError, "Failed to generate google pass link, Email sent failed.")
+
+	}
+	
+	$$$TRACE("Global Value:"_$GET(^PassLink))
+	$$$TRACE("Status: "_ret)
+
+	//Get info from object and create message
+	Set Message = "Hello "_$Get(^name)
+
+	//Create new %Net.MailMessage object which will have all the email data
+	Set email=##class(%Net.MailMessage).%New()
+
+    Do email.TextData.Write(Message)
+    Do email.TextData.Write(",<br>Our Records show that you have an appointment on "_Object.Date)
+    Do email.TextData.Write(" with "_Object.Doctor_" at "_Object.Hospital_" , "_Object.Location_" in regards to "_Object.Service)
+    Do email.TextData.Write(".<br>Please ensure that you bring all the required documents to your appointment.")
+    Do email.TextData.Write("<br>To add your appointment to your Google wallet, Please click the following Button. ")
+    Do email.TextData.Write("<table border=""0"" cellpadding=""0"" cellspacing=""0"" class=""btn btn-primary"" style=""border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box; min-width: 100% !important;"" width=""100%""> ")
+    Do email.TextData.Write("<tr><td align=""center"" style=""font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;"" valign=""top"">")
+    Do email.TextData.Write("<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;""><tr>")
+    
+    Do email.TextData.Write("<td style=""font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;"" valign=""top"" bgcolor=""#3498db"" align=""center""> ")
+  	Do email.TextData.Write("<a href="" "_$Get(^PassLink)_" ""target=""Blank"" style=""display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;"">Add To Google Pass</a> ")
+ 	Do email.TextData.Write("</td></tr></table></td></tr></table>")
+    
+    Set email.IsHTML = 1
+    Set email.Subject= "Appointment Confirmation"
+
+    // Add recipient from the JSON Object
+    Set tSc = ..Adapter.AddRecipients(email,Object.Email)
+    //simple case--do not check for failed recipients
+    Set tSc=..Adapter.SendMail(email)
+	//Check if email is sent successfully
+    If $$$ISOK(tSc) { 
+     Set pResponse.StringValue = "Success.. Email sent!"
+    }
+    else {
+	Set pResponse.StringValue = "Email send failed."
+  	 }
+	Quit tSc
+
+ 
+	//Quit $$$OK
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+  <MapItem MessageType="Ens.StringContainer">
+    <Method>SendSimpleEmail</Method>
+  </MapItem>
+</MapItems>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Simple.NewRestService">
+<Super>%CSP.REST,Ens.BusinessService</Super>
+<TimeChanged>65778,78091.862165</TimeChanged>
+<TimeCreated>65751,77007.409853</TimeCreated>
+
+<XData name="UrlMap">
+<Data><![CDATA[
+<Routes>
+<Route Url="/SendEmail" Method="POST" Call="SendEmail"/>
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="SendEmail">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	//Read JSON string into variable.
+	Set Data = %request.Content.Read()
+
+	//Create a persistent object of Ens.StringContainer
+	Set Object = ##class(Ens.StringContainer).%New()
+
+	//Assign JSON string data to Object.Stringvalue property
+	Set Object.StringValue= Data
+
+	//Create an object of business service
+	set tSc = ##class(Ens.Director).CreateBusinessService("NewRestService",.tService)
+
+	//Send Object data to OnProcessInput method of the business service
+	set tSc = tService.OnProcessInput(Object,.Output)
+	If ($$$ISERR(tSc)) Quit tSC
+
+	Write Output
+
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="OnProcessInput">
+<FormalSpec>pInput:Ens.StringContainer,*pOutput:%RegisteredObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+	Set tSc = ..SendRequestAsync("NewRestEmailOperation",pInput)
+	Set tSc = ..SendRequestAsync("SmsOperation",pInput)
+
+	//$$$TRACE(Response.StringValue)
+
+	$$$TRACE(tSc)
+
+	Set pOutput = "Request Sent"
+
+	Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="Simple.PassService">
+<Super>Ens.BusinessService</Super>
+<TimeChanged>65751,62470.643931</TimeChanged>
+<TimeCreated>65749,75336.975119</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.HTTP.InboundAdapter</Default>
+</Parameter>
+
+<Method name="OnProcessInput">
+<FormalSpec>pInput:%Stream.Object,*pOutput:%Stream.Object</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	//Set out = ""
+	set custobj1 = ##class(Simple.CustomObject).%New()
+	set custobj1.Data=pInput.Read()
+	set result = ..SendRequestAsync("RestEmailOperation", custobj1)
+	$$$TRACE(out)
+	if (result = 1)
+	{
+	set pOutput = "Success"
+	} else
+	{
+	set pOutput = "Failure"	
+	}
+	Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="Simple.SmsOperation">
+<Super>Ens.BusinessOperation</Super>
+<TimeChanged>65779,43289.516483</TimeChanged>
+<TimeCreated>65778,77863.429217</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.HTTP.OutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>EnsLib.HTTP.OutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="SendSMS">
+<Description>
+The alert notification</Description>
+<FormalSpec>pRequest:Ens.StringContainer,*pResponse:Ens.Response</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set pResponse = ##class(Ens.StringContainer).%New()
+	// Shows data in the Management portal under message viewer -> trace tab -> Full trace
+	$$$TRACE(pRequest)
+	$$$TRACE(pRequest.StringValue)
+
+	//Convert JSON String to Dynamic object.
+	Set Object = ##class(%DynamicObject).%FromJSON(pRequest.StringValue)
+ set tSC = $$$OK
+ try 
+ {
+  set txtmessage = "Hello "_Object.Name_", You have an appointment at "_Object.Hospital_" on "_Object.Date_". Click here for google wallet pass https://passlink/DL1r4"
+  set destination = Object.Phone
+  //set action="sms"
+  //set credentials = "<user token>" 
+  
+  set tSC = ..Adapter.Get(.pResponse,"destination,text",destination,txtmessage)
+
+ }
+ catch ex
+ {
+ set tSC = ex.AsStatus()
+ }
+
+ return tSC
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+ <MapItem MessageType="Ens.StringContainer">
+ <Method>SendSMS</Method>
+ </MapItem>
+ </MapItems>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Simple.ZFwrapper">
+<Language>objectscript</Language>
+<Super>%RegisteredObject</Super>
+<TimeChanged>65759,40277.104006</TimeChanged>
+<TimeCreated>65759,40277.104006</TimeCreated>
+
+<Method name="RunCmd">
+<Description><![CDATA[
+Simple wrapper for $zf(-100). This reduces our reliance on <class>%Studio.SourceControl.ISC</class>.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[Command:%String,&args,&Output]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set errortext = ""
+ #dim status as %Status = $$$OK
+ set outfile = ##class(%File).TempFilename("out"), 
+ errfile = ##class(%File).TempFilename("err")
+ try
+ {
+ set rc = $zf(-100,"/STDOUT="""_outfile_"""/STDERR="""_errfile_"""", Command, .args)
+ }
+ catch 
+ {
+ return $$$ERROR($$$FileDoesNotExist, Command)
+ }
+ set outstream = ##class(%Stream.FileCharacter).%New(), errstream = ##class(%Stream.FileCharacter).%New()
+ do errstream.LinkToFile(errfile)
+ if (errstream.Size>0)
+ {
+ while 'errstream.AtEnd
+ {
+ set line = errstream.ReadLine()
+ set errortext = errortext_line
+ }
+ set status = $$$ERROR($$$GeneralError,errortext)
+ }
+ 
+ do outstream.LinkToFile(outfile)
+ while 'outstream.AtEnd
+ {
+ set line = outstream.ReadLine()
+ set Output($increment(Output)) = line
+ }
+ do ##class(%File).Delete(outfile)
+ do ##class(%File).Delete(errfile)
+ quit status
+]]></Implementation>
+</Method>
+</Class>
+
+
+</Export>
