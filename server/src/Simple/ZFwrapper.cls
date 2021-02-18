@@ -1,6 +1,7 @@
 Class Simple.ZFwrapper Extends %RegisteredObject [ Language = objectscript ]
 {
 
+/// Author: Joloyn Smith
 /// Simple wrapper for $zf(-100). This reduces our reliance on <class>%Studio.SourceControl.ISC</class>.
 ClassMethod RunCmd(Command As %String, ByRef args, ByRef Output) As %Status
 {

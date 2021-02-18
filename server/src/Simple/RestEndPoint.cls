@@ -1,6 +1,12 @@
 Class Simple.RestEndPoint Extends %CSP.REST [ Language = objectscript ]
 {
 
+/// Author: Harshitha Acha(Harshitha.Acha@intersystems.com)
+/// This is a REST API class which creates a REST end point to recieve requests from TrakCare.
+/// The class method SendEMail() converts the recieved JSON object into a StringContainer and forwards to 
+/// a business operation.
+/// The URLMap defines the endpoint of the API. 
+/// Further Settings to create REST endpoint are configured in Management portal under WebApplications.
 XData UrlMap
 {
 <Routes>
