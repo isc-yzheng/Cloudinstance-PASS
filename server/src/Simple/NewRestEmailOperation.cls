@@ -1,5 +1,8 @@
-/// Author: Harshitha Acha(harshitha.acha@intersystems.com)
-/// Co-author(apple pass): Michael Yuanhao Zheng(Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+/// Author: Harshitha Acha - (harshitha.acha@intersystems.com)
+///         (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+/// 		Sachin Malik - (Sachin.Malik@InterSystems.com)
+///         (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+/// 
 /// This class performs the operations needed to generate google and apple passes.
 /// In order to generate a pass, the operation makes a call to Python script with data object recieved from business service.
 /// Python script is called using a ZF() wrapper. The data required by the passes generation script is passed using Globals.

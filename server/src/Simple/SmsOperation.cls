@@ -1,4 +1,7 @@
 /// Author: Harshitha Acha, Harshitha.acha@intersystems.com
+///         (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+/// 		Sachin Malik - (Sachin.Malik@InterSystems.com)
+///         (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
 /// This calss is created to send HTTP GET requests to Telstra API
 /// The Class implements SendSMS method which takes a parameter pRequest as Ens.StringContainer and
 /// send SMS to the patient's mobile number given in the Object.

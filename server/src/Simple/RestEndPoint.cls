@@ -1,7 +1,11 @@
 Class Simple.RestEndPoint Extends %CSP.REST [ Language = objectscript ]
 {
 
-/// Author: Harshitha Acha(Harshitha.Acha@intersystems.com)
+/// Author: Harshitha Acha - (harshitha.acha@intersystems.com)
+///         (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+/// 		Sachin Malik - (Sachin.Malik@InterSystems.com)
+///         (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+/// 
 /// This is a REST API class which creates a REST end point to recieve requests from TrakCare.
 /// The class method SendEMail() converts the recieved JSON object into a StringContainer and forwards to 
 /// a business operation.
