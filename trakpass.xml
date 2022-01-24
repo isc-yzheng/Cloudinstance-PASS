@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2021.2 (Build 649U)" ts="2022-01-24 18:15:28">
+<Class name="TrakPass.PassProduction">
+<Super>Ens.Production</Super>
+<TimeChanged>66133,59510.988959562</TimeChanged>
+<TimeCreated>65828,79044.934345</TimeCreated>
+
+<XData name="ProductionDefinition">
+<Data><![CDATA[
+<Production Name="TrakPass.PassProduction" LogGeneralTraceEvents="false">
+  <Description>Production for TrakPass function</Description>
+  <ActorPoolSize>2</ActorPoolSize>
+  <Item Name="PassService" Category="" ClassName="Simple.NewRestService" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+  </Item>
+  <Item Name="PassEmailOperation" Category="" ClassName="Simple.NewRestEmailOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="From">appointment@autrakpass.com</Setting>
+    <Setting Target="Adapter" Name="SMTPPort">25</Setting>
+    <Setting Target="Adapter" Name="SMTPServer">mail.iscinternal.com</Setting>
+    <Setting Target="Adapter" Name="SSLConfig"></Setting>
+  </Item>
+  <Item Name="PassSmsOperation" Category="" ClassName="Simple.SmsOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="true" Schedule="">
+    <Setting Target="Adapter" Name="HTTPServer">tim.telstra.com</Setting>
+    <Setting Target="Adapter" Name="SSLConfig">ISC.FeatureTracker.SSL.Config</Setting>
+    <Setting Target="Adapter" Name="URL">/cgphttp/servlet/sendmsg</Setting>
+    <Setting Target="Adapter" Name="Credentials">sms</Setting>
+  </Item>
+</Production>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="TrakPass.Request.Content">
+<Super>Ens.Request,%JSON.Adaptor</Super>
+<TimeChanged>65807,64527.411349</TimeChanged>
+<TimeCreated>65807,64182.391901</TimeCreated>
+
+<Property name="Name">
+<Type>%String</Type>
+</Property>
+
+<Property name="Email">
+<Type>%String</Type>
+</Property>
+
+<Property name="RegistrationNo">
+<Type>%String</Type>
+</Property>
+
+<Property name="Date">
+<Type>%String</Type>
+</Property>
+
+<Property name="Doctor">
+<Type>%String</Type>
+</Property>
+
+<Property name="Hospital">
+<Type>%String</Type>
+</Property>
+
+<Property name="HospitalPhone">
+<Type>%String</Type>
+</Property>
+
+<Property name="HospitalAddress">
+<Type>%String</Type>
+</Property>
+
+<Property name="Location">
+<Type>%String</Type>
+</Property>
+
+<Property name="Service">
+<Type>%String</Type>
+</Property>
+
+<Method name="GetJSON">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ID:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    set object = ..%OpenId(ID,0)
+    do object.%JSONExport(.json)
+    quit json
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Storage.Persistent</Type>
+<DefaultData>ContentDefaultData</DefaultData>
+<Data name="ContentDefaultData">
+<Structure>listnode</Structure>
+<Subscript>"Content"</Subscript>
+<Value name="1">
+<Value>Name</Value>
+</Value>
+<Value name="2">
+<Value>Email</Value>
+</Value>
+<Value name="3">
+<Value>RegistrationNo</Value>
+</Value>
+<Value name="4">
+<Value>Date</Value>
+</Value>
+<Value name="5">
+<Value>Doctor</Value>
+</Value>
+<Value name="6">
+<Value>Hospital</Value>
+</Value>
+<Value name="7">
+<Value>HospitalPhone</Value>
+</Value>
+<Value name="8">
+<Value>HospitalAddress</Value>
+</Value>
+<Value name="9">
+<Value>Location</Value>
+</Value>
+<Value name="10">
+<Value>Service</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+</Export>

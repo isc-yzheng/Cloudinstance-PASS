@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2021.2 (Build 649U)" ts="2022-01-24 18:15:04">
+<Class name="Simple.NewRestEmailOperation">
+<Description>
+Author: (Michael) Yuanhao Zheng - (Michael.Zheng@InterSystems.com)
+        Harshitha Acha - (harshitha.acha@intersystems.com)
+		Sachin Malik - (Sachin.Malik@InterSystems.com)
+        (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+
+This class performs the operations needed to generate google and apple passes.
+</Description>
+<Super>Ens.BusinessOperation</Super>
+<TimeChanged>66133,65226.549912564</TimeChanged>
+<TimeCreated>65807,63473.553458</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.EMail.OutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>EnsLib.EMail.OutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="SendSimpleEmail">
+<FormalSpec>pRequest:Ens.StringContainer,*pResponse:Ens.StringContainer</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set pResponse = ##class(Ens.StringContainer).%New()
+	// Shows data in the Management portal under message viewer -> trace tab -> Full trace
+	$$$TRACE(pRequest.StringValue)
+
+	//Convert JSON String to Dynamic object.
+	set Object = ##class(%DynamicObject).%FromJSON(pRequest.StringValue)
+
+	$$$TRACE(Object.Name)
+	$$$TRACE(Object.Email)
+
+	//Call python method to create google wallet link
+	
+	set tPassLink = ##class(Simple.PythonUtil).Generate(Object.Name, Object.RegistrationNo, Object.Date, Object.Doctor, Object.Hospital, Object.HospitalPhone, Object.HospitalAddress, Object.Location, Object.Service)
+	
+	$$$TRACE("Pass Link Value: "_tPassLink)
+
+	if tPassLink = ""
+	{
+		return $$$ERROR($$$GeneralError, "Failed to generate google pass link.")
+	}
+	
+	// Kill the temporary global
+	kill ^zMZ("PassLink")
+	
+	// Store the pass link into a temporary global for the SMS operation to use
+	set ^zMZ("PassLink") = tPassLink
+	
+	//Request for SMS operation
+	set tSc = ..SendRequestAsync("PassSmsOperation",pRequest)
+    
+    //Call python script to generate apple pass
+    
+	/*set args2($increment(args2)) = "/trakpass/app/apple/main.py" 
+    set ret2 = ##class(Simple.ZFwrapper).RunCmd("python3",.args2,.output2)
+	$$$TRACE("Status of APPLE: "_ret2)*/
+
+	//Get info from object and create message
+	set Message = "Hello <b>"_Object.Name_"</b>"
+
+	//Create new %Net.MailMessage object which will have all the email data
+	set email=##class(%Net.MailMessage).%New()
+   
+   	do email.TextData.Write(Message)
+   	do email.TextData.Write(",<br>Our Records show that you have an appointment on <b>"_Object.Date_"</b>")
+    do email.TextData.Write(" with <b>"_Object.Doctor_"</b>")
+    do email.TextData.Write(" at <b>"_Object.Hospital_", "_Object.Location_"</b>")
+    do email.TextData.Write(" in regards to <b>"_Object.Service_"</b>")
+    do email.TextData.Write(".<br>Please ensure that you bring all the required documents to your appointment.")
+    do email.TextData.Write("<br>To add your appointment to your <b>Google wallet</b>, Please click the following button.")
+    do email.TextData.Write("<table border=""0"" cellpadding=""0"" cellspacing=""0"" class=""btn btn-primary"" style=""border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box; min-width: 100% !important;"" width=""100%""> ")
+    do email.TextData.Write("<tr><td align=""center"" style=""font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;"" valign=""top"">")
+    do email.TextData.Write("<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;""><tr>")
+    do email.TextData.Write("<td style=""font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;"" valign=""top"" bgcolor=""#3498db"" align=""center""> ")
+  	do email.TextData.Write("<a href="" "_tPassLink_" ""target=""Blank"" style=""display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;"">Add To Google Pass</a> ")
+ 	do email.TextData.Write("</td></tr></table></td></tr></table>")
+ 	do email.TextData.Write("(Apple currently disabled) To add your appointment to your <b>Apple wallet</b>, Please download the attached <b>apple.pkpass</b> file.")
+    //Add attachment
+	// do email.AttachFile("/trakpass/data/trakpass/","apple.pkpass")
+
+    set email.IsHTML = 1
+    set email.Subject= "Appointment Confirmation - "_Object.Date_" at "_Object.Hospital 
+
+    // Add recipient from the JSON Object
+    set tSc = ..Adapter.AddRecipients(email,Object.Email)
+    //simple case--do not check for failed recipients
+    set tSc=..Adapter.SendMail(email)
+	//Check if email is sent successfully
+    if $$$ISOK(tSc) 
+	{ 
+     set pResponse.StringValue = "Success.. Email sent!"
+    }
+    else 
+	{
+		set pResponse.StringValue = "Email send failed."
+  	}
+	quit tSc
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+  <MapItem MessageType="Ens.StringContainer">
+    <Method>SendSimpleEmail</Method>
+  </MapItem>
+</MapItems>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Simple.NewRestService">
+<Description>
+Author: (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+        Harshitha Acha - (harshitha.acha@intersystems.com)       
+		Sachin Malik - (Sachin.Malik@InterSystems.com)
+        (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+
+This business service forwards the recieved JSON object to Email Operation and SMS operation
+Both the requests are made Asynchronosly to make sure the operations don't hold TrakCare in waiting state for long.</Description>
+<Super>Ens.BusinessService</Super>
+<TimeChanged>65828,80021.118159</TimeChanged>
+<TimeCreated>65807,63468.539687</TimeCreated>
+
+<Method name="OnProcessInput">
+<FormalSpec>pInput:Ens.StringContainer,*pOutput:%RegisteredObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	//Send Async 
+	Set tSc = ..SendRequestAsync("PassEmailOperation",pInput)
+	$$$TRACE(tSc)
+	Set pOutput = "Request Sent" //Response.StringValue
+
+	Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="Simple.PythonUtil">
+<Super>%RegisteredObject</Super>
+<TimeChanged>66133,61502.301405079</TimeChanged>
+<TimeCreated>66133,58518.298160437</TimeCreated>
+
+<Method name="Generate">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pName:%String="",pMRN:%String="",pDate:%String="",pDoctor:%String="",pHospital:%String="",pHospitalPhone:%String="",pHospitalAddress:%String="",pLocation:%String="",pService:%String=""</FormalSpec>
+<Language>python</Language>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+    import iris
+    from googlepass.passgenerator import config # contains constants
+    from googlepass.passgenerator import services # methods that returns JWTs to be used to rend "save to phone" button
+    import uuid # std library for unique identifier generation
+    
+    SAVE_LINK = "https://pay.google.com/gp/v/save/" # Save link that uses JWT. See https://developers.google.com/pay/passes/guides/get-started/implementing-the-api/save-to-google-pay#add-link-to-email
+    
+    def demoSkinnyJwt(verticalType, classId, objectId):
+
+        print("Generates a signed skinny JWT.")
+
+        skinnyJwt = services.makeSkinnyJwt(verticalType, classId, objectId, pName, pMRN, pDate, pDoctor, pHospital, pHospitalPhone, pHospitalAddress, pLocation, pService)
+        
+        passlink = ""
+
+        if skinnyJwt is not None:
+            print('This is an "skinny" jwt:\n%s\n' % (skinnyJwt.decode('UTF-8')) )
+            print('you can decode it with a tool to see the unsigned JWT representation:\n%s\n' % ('https://jwt.io') )
+            print("[1. Setting and getting a global]")
+
+            passlink = SAVE_LINK+skinnyJwt.decode('UTF-8')
+
+            print("The value of testglobal is ", passlink)
+
+        return passlink
+    
+    #############################
+    # RUNNER
+    # This script demonstrates using your services which make JWTs
+    # The JWTs are used to generate save links or JS Web buttons to save Pass(es)
+    #
+    # 1) Get credentials and check prerequisistes in: https://developers.google.com/pay/passes/samples/quickstart-python.
+    # 2) Modify config.py so the credentials are correct.
+    # 3) Try running it: python main.py . Check terminal output for server response, JWT, and save links.
+    #############################
+    
+    verticalType = services.VerticalType.EVENTTICKET
+
+    # your classUid should be a hash based off of pass metadata, for the demo we will use pass-type_class_uniqueid
+    classUid = str(verticalType).split('.')[1] + '_CLASS_'+ str(uuid.uuid4()) # CHANGEME
+    # check Reference API for format of "id" (https://developers.google.com/pay/passes/reference/v1/o).
+    # must be alphanumeric characters, '.', '_', or '-'.
+    classId = '%s.%s' % (config.ISSUER_ID,classUid)
+
+    # your objectUid should be a hash based off of pass metadata, for the demo we will use pass-type_object_uniqueid
+    objectUid = str(verticalType).split('.')[1] + '_OBJECT_'+ str(uuid.uuid4()) # CHANGEME
+    # check Reference API for format of "id" (https://developers.google.com/pay/passes/reference/v1/).
+    # Must be alphanumeric characters, '.', '_', or '-'.
+    objectId = '%s.%s' % (config.ISSUER_ID,objectUid)
+
+    # demonstrate the different "services" that make links/values for frontend to render a functional "save to phone" button
+    #demoFatJwt(verticalType, classId, objectId)
+    #demoObjectJwt(verticalType, classId, objectId)
+    link = demoSkinnyJwt(verticalType, classId, objectId)
+    
+    return link
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="Simple.RestEndPoint">
+<Language>objectscript</Language>
+<Super>%CSP.REST</Super>
+<TimeChanged>65828,79984.530012</TimeChanged>
+<TimeCreated>65807,63478.513336</TimeCreated>
+
+<XData name="UrlMap">
+<Description>
+Author: (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+        Harshitha Acha - (harshitha.acha@intersystems.com)
+		Sachin Malik - (Sachin.Malik@InterSystems.com)
+        (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+
+This is a REST API class which creates a REST end point to recieve requests from TrakCare.
+The class method SendEMail() converts the recieved JSON object into a StringContainer and forwards to 
+a business operation.
+The URLMap defines the endpoint of the API. 
+Further Settings to create REST endpoint are configured in Management portal under WebApplications.</Description>
+<Data><![CDATA[
+<Routes>
+	<Route Url="/SendEmail" Method="POST" Call="SendEmail"/>
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="SendEmail">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	//Read JSON string into variable.
+	set Data = %request.Content.Read()
+
+	//Create a persistent object of Ens.StringContainer
+	set Object = ##class(Ens.StringContainer).%New()
+
+	//Assign JSON string data to Object.Stringvalue property
+	set Object.StringValue = Data
+
+	//Create an object of business service
+	set tSc = ##class(Ens.Director).CreateBusinessService("PassService",.tService)
+
+	//Send Object data to OnProcessInput method of the business service
+	set tSc = tService.OnProcessInput(Object,.Output)
+	if ($$$ISERR(tSc)) quit tSC
+
+	write Output
+
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="Simple.SmsOperation">
+<Description>
+Author: (Michael) Yuanhao Zheng - (Yuanhao.Zheng@InterSystems.com / likeping13@gmail.com)
+        Harshitha Acha - (harshitha.acha@intersystems.com)
+		Sachin Malik - (Sachin.Malik@InterSystems.com)
+        (Quentin) Jianjie Yu - (Jianjie.Yu@InterSystems.com)
+This calss is created to send HTTP GET requests to Telstra API
+The Class implements SendSMS method which takes a parameter pRequest as Ens.StringContainer and
+send SMS to the patient's mobile number given in the Object.
+Settings like API endpoint, credentials are configured using production item settings
+from front end. </Description>
+<Language>objectscript</Language>
+<Super>Ens.BusinessOperation</Super>
+<TimeChanged>66133,65208.319203339</TimeChanged>
+<TimeCreated>65807,63483.517261</TimeCreated>
+
+<Parameter name="ADAPTER">
+<Default>EnsLib.HTTP.OutboundAdapter</Default>
+</Parameter>
+
+<Property name="Adapter">
+<Type>EnsLib.HTTP.OutboundAdapter</Type>
+</Property>
+
+<Parameter name="INVOCATION">
+<Default>Queue</Default>
+</Parameter>
+
+<Method name="SendSMS">
+<Description>
+The alert notification</Description>
+<FormalSpec>pRequest:Ens.StringContainer,*pResponse:Ens.Response</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set pResponse = ##class(Ens.StringContainer).%New()
+	// Shows data in the Management portal under message viewer -> trace tab -> Full trace
+	$$$TRACE(pRequest)
+	$$$TRACE(pRequest.StringValue)
+	$$$TRACE("Temporary Global Link: "_$get(^zMZ("PassLink"),""))
+
+	//Convert JSON String to Dynamic object.
+	set Object = ##class(%DynamicObject).%FromJSON(pRequest.StringValue)
+	set tSC = $$$OK
+	try 
+	{
+		set txtmessage = "Hello "_Object.Name_", You have an appointment at "_Object.Hospital_" on "_Object.Date_ ". Click the link for google wallet pass: "_$get(^zMZ("PassLink"),"")
+		set destination = Object.Phone  
+		set tSC = ..Adapter.Get(.pResponse,"destination,text",destination,txtmessage)
+	}
+	catch ex
+	{
+		set tSC = ex.AsStatus()
+	}
+
+ return tSC
+]]></Implementation>
+</Method>
+
+<XData name="MessageMap">
+<Data><![CDATA[
+<MapItems>
+ <MapItem MessageType="Ens.StringContainer">
+ <Method>SendSMS</Method>
+ </MapItem>
+ </MapItems>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="Simple.ZFwrapper">
+<Abstract>1</Abstract>
+<Language>objectscript</Language>
+<TimeChanged>65807,64839.755208</TimeChanged>
+<TimeCreated>65807,63490.762443</TimeCreated>
+
+<Method name="RunCmd">
+<Description><![CDATA[
+Author: Joloyn Smith
+Simple wrapper for $zf(-100). This reduces our reliance on <class>%Studio.SourceControl.ISC</class>.]]></Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[Command:%String,&args,&Output]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    set errortext = ""
+    #dim status as %Status = $$$OK
+    set outfile = ##class(%File).TempFilename("out"), 
+    errfile = ##class(%File).TempFilename("err")
+    try
+    {
+        set rc = $zf(-100,"/STDOUT="""_outfile_"""/STDERR="""_errfile_"""", Command, .args)
+    }
+    catch 
+    {
+        return $$$ERROR($$$FileDoesNotExist, Command)
+    }
+    set outstream = ##class(%Stream.FileCharacter).%New(), errstream = ##class(%Stream.FileCharacter).%New()
+    do errstream.LinkToFile(errfile)
+    if (errstream.Size>0)
+    {
+        while 'errstream.AtEnd
+        {
+            set line = errstream.ReadLine()
+            set errortext = errortext_line
+        }
+        set status = $$$ERROR($$$GeneralError,errortext)
+    }
+    
+    do outstream.LinkToFile(outfile)
+    while 'outstream.AtEnd
+    {
+        set line = outstream.ReadLine()
+        set Output($increment(Output)) = line
+    }
+    do ##class(%File).Delete(outfile)
+    do ##class(%File).Delete(errfile)
+    quit status
+]]></Implementation>
+</Method>
+</Class>
+
+
+</Export>
