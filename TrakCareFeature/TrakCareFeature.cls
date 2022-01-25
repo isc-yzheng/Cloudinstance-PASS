@@ -7,30 +7,43 @@ ClassMethod PatientNotification() As %String
 {
 	set PatientID=$get(%request.Data("PatientID",1))
 	if PatientID="" quit 1
-	set apptId=$get(%request.Data("ID",1))
+	set apptId=%UDF.Id
 	if apptId="" quit 1
 
 	set apptData=$get(^RBAS(+apptId,+$piece(apptId,"||",2),"APPT",$piece(apptId,"||",3)))
 	set patientName=##class(web.PAPerson).GetNameForDisplay(PatientID)
-	set patientEmail=$piece($get(^PAPER(PatientID,"PER",4)),"^",19) //PAPER_Email
+	set patientUrn=##class(web.PAPatMas).GetRegistration(PatientID)
+	set patientEmail=$piece($get(^PAPER(PatientID,"PER",4)),"^",19) // PAPER_Email
+	set patientPhone=$piece($get(^PAPER(PatientID,"PER",4)),"^",21) // PAPER_MobPhone
 	set apptDate=##class(websys.Conversions).DateLogicalToHtml($piece($get(^RBAS(+apptId,+$piece(apptId,"||",2))),"^")) //AS_Date
 	set apptTime=##class(websys.Conversions).TimeLogicalToHtml($piece($get(^RBAS(+apptId,+$piece(apptId,"||",2))),"^",4)) //AS_SessStartTime
-	set doctor=$listget(##class(web.RBResource).GetCP(+apptId),1)
-	set hospital=##class(web.RBResource).GetHospital(+apptId)
-	set location=##class(web.RBResource).GetLocDescriptionFromRes(+apptId)
+	set Resource=##class(User.RBResource).%OpenId(+apptId)
+	if Resource.RESCTPCPDR set doctor=Resource.RESCTPCPDR.CTPCPDesc
+	if Resource.RESCTLOCDR,Resource.RESCTLOCDR.CTLOCHospitalDR {
+		#dim Hospital as User.CTHospital = Resource.RESCTLOCDR.CTLOCHospitalDR
+		set hospital=Hospital.HOSPDesc
+		set hospitalPhone=Hospital.HOSPPhone
+		set hospitalAddress=Hospital.HOSPAddress
+		if Hospital.HOSPCity set hospitalAddress=hospitalAddress_" "_Hospital.HOSPCity.CTCITDesc
+		if Hospital.HOSPState set hospitalAddress=hospitalAddress_" "_Hospital.HOSPState.CTSTTCode
+		if Hospital.HOSPZipDR set hospitalAddress=hospitalAddress_" "_Hospital.HOSPZipDR.CTZIPCode
+	}
+	if Resource.RESCTLOCDR set location=Resource.RESCTLOCDR.CTLOCDesc
 	set serviceId=$piece(apptData,"^",15) //APPT_RBCServ_DR
 	set service=$piece($get(^RBC("SER", serviceId)),"^",6)
 
 	set json={
 		"Name":(patientName),
+			"RegistrationNo":(patientUrn),
 			"Email":(patientEmail),
+			"Phone":(patientPhone),
 			"Date":(apptDate_" "_apptTime),
-			"Doctor": (doctor),
-			"Hospital": (hospital),
-			"Location": (location),
-			"Service": (service),
-			"Gwallet" : "http://fakegooglewallet.com/googlepass",
-			"Awallet" : "http://fakeapplewallet.com/applepass"
+			"Doctor": ($get(doctor)),
+			"Hospital": ($get(hospital)),
+			"HospitalPhone": ($get(hospitalPhone)),
+			"HospitalAddress": ($get(hospitalAddress)),
+			"Location": ($get(location)),
+			"Service": (service)
 	}
 	
 	set url=%UDF.FeatureParameters("zSSHPatientNotification","REST URL")
@@ -42,8 +55,15 @@ ClassMethod PatientNotification() As %String
 	do httpRequest.EntityBody.Write(json.%ToJSON())
 	set server=$piece(url,"http://",2)
 	set server=$piece(server,"/",1)
+	if server[":" {
+		set port=$piece(server,":",2)
+		set server=$piece(server,":",1)
+	} else {
+		set port=80
+	}
 	set path="/"_$piece(url,"/",4,*)
 	set httpRequest.Server=server
+	set httpRequest.Port=port
 	do httpRequest.Post(path)
 	quit 1
 }
